@@ -11,7 +11,7 @@ def cache_image(img):
     st.image(img)
 
 
-screening_file = '/content/drive/MyDrive/ColabNotebooks/demo.xlsx'
+screening_file = 'demo.xlsx'
 df = pd.read_excel(screening_file)
 
 st.set_page_config(layout="wide")
