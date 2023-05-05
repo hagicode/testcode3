@@ -12,7 +12,7 @@ def cache_image(img):
 
 
 screening_file = 'demo.xlsx'
-df = pd.read_excel(screening_file)
+df = pd.read_excel(screening_file,sheet="DEMO")
 
 st.set_page_config(layout="wide")
 
