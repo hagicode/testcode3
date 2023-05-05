@@ -21,7 +21,7 @@ st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">手
 
 method = option_menu("Method Menu", options=["グランビルNo3", "Granville3", "Granville4", "Perfect Order", "Zenmo", "SMA200"],
     #icons=['house', 'gear', 'gear'],
-    menu_icon="cast", default_index=0)
+    menu_icon="cast", default_index=0, orientation="horizontal")
 
 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">プライスアクション・移動平均線</p>', unsafe_allow_html=True)
