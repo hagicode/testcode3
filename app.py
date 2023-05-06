@@ -33,11 +33,11 @@ col1,col2,col3,col4 = st.columns([1,1,1,1])
 
 #マルチセレクトで抽出可能なカラムから選択肢を作成
 #multi_selectbox_columns = ["ローソク","髭","寄り天・底","大陽線・陰線"]
-multi_selectbox_columns = df.columns[1:]
+multi_selectbox_columns = df.filter(like="R@",axis=1).columns
 select_option = list(df[multi_selectbox_columns].stack().unique())
 
-
-
+multi_selectbox_columns_2 = df.filter(like="MA@",axis=1).columns
+select_option_2 = list(df[multi_selectbox_columns_2].stack().unique())
 
 with col1:
     #選択された項目
@@ -51,7 +51,7 @@ data = df[df[select_columns].isin(mul_sel).sum(axis=1)==len(select_columns)]
 
 with col2:
     #選択された項目
-    mul_sel2 = st.multiselect("移動平均線との関係", (select_option)) 
+    mul_sel2 = st.multiselect("移動平均線との関係", (select_option_2)) 
 
 
 # selected = [method,"ローソク"]
