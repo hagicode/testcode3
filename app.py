@@ -33,7 +33,7 @@ col1,col2,col3,col4 = st.columns([1,1,1,1])
 
 #マルチセレクトで抽出可能なカラムから選択肢を作成
 #multi_selectbox_columns = ["ローソク","髭","寄り天・底","大陽線・陰線"]
-multi_selectbox_columns = df.columns
+multi_selectbox_columns = df.columns[1:]
 select_option = list(df[multi_selectbox_columns].stack().unique())
 
 
