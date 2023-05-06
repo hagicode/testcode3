@@ -36,8 +36,8 @@ col1,col2,col3,col4 = st.columns([1,1,1,1])
 multi_selectbox_columns = df.filter(like="R@",axis=1).columns
 select_option = list(df[multi_selectbox_columns].stack().unique())
 
-multi_selectbox_columns_2 = df.filter(like="MA@",axis=1).columns
-select_option_2 = list(df[multi_selectbox_columns_2].stack().unique())
+multi_selectbox_columns2 = df.filter(like="MA@",axis=1).columns
+select_option2 = list(df[multi_selectbox_columns2].stack().unique())
 
 with col1:
     #選択された項目
@@ -46,11 +46,11 @@ with col1:
 
 with col2:
     #選択された項目
-    mul_sel2 = st.multiselect("移動平均線との関係", (select_option_2)) 
+    mul_sel2 = st.multiselect("移動平均線との関係", (select_option2)) 
 
 
 #選択された項目を含む列
-select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0] + df.columns[df.isin(mul_sel_2).sum(axis=0)>0]
+select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0] + df.columns[df.isin(mul_sel2).sum(axis=0)>0]
 
 #選択された項目で抽出したデータフレーム
 data = df[df[select_columns].isin(mul_sel).sum(axis=1)==len(select_columns)]
