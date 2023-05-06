@@ -11,8 +11,11 @@ def cache_image(img):
     st.image(img)
 
 
-screening_file = 'demo.xlsx'
-df = pd.read_excel(screening_file,sheet_name="DEMO")
+#screening_file = 'demo.xlsx'
+#df = pd.read_excel(screening_file,sheet_name="DEMO")
+
+screening_file = 'DEMO (1).xlsx'
+df = pd.read_excel(screening_file,sheet_name="Sheet1")
 
 st.set_page_config(layout="wide")
 
@@ -29,7 +32,8 @@ st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">プ
 col1,col2,col3,col4 = st.columns([1,1,1,1])
 
 #マルチセレクトで抽出可能なカラムから選択肢を作成
-multi_selectbox_columns = ["ローソク","髭","寄り天・底","大陽線・陰線"]
+#multi_selectbox_columns = ["ローソク","髭","寄り天・底","大陽線・陰線"]
+multi_selectbox_columns = df.columns
 select_option = list(df[multi_selectbox_columns].stack().unique())
 
 
