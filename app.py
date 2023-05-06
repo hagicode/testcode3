@@ -59,7 +59,7 @@ data = df[df[select_columns].isin(mul_sel).sum(axis=1)==len(select_columns)]
 # data = df[df[method]=="〇"][df["ローソク"]==button1].drop(columns=selected)
 
 
-st.subheader('Data') 
+st.subheader('Data' + len(data)+"銘柄") 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。</p>', unsafe_allow_html=True)
 
 gb = GridOptionsBuilder.from_dataframe(data)
