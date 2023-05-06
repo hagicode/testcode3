@@ -43,17 +43,17 @@ with col1:
     #選択された項目
     mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option)) 
 
-#選択された項目を含む列
-select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0]
-
-#選択された項目で抽出したデータフレーム
-data = df[df[select_columns].isin(mul_sel).sum(axis=1)==len(select_columns)]
 
 with col2:
     #選択された項目
     mul_sel2 = st.multiselect("移動平均線との関係", (select_option_2)) 
 
 
+#選択された項目を含む列
+select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0] + df.columns[df.isin(mul_sel_2).sum(axis=0)>0]
+
+#選択された項目で抽出したデータフレーム
+data = df[df[select_columns].isin(mul_sel).sum(axis=1)==len(select_columns)]
 # selected = [method,"ローソク"]
 # print(selected)
 # data = df[df[method]=="〇"][df["ローソク"]==button1].drop(columns=selected)
