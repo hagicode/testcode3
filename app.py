@@ -57,7 +57,7 @@ if default_button =='Granvil_example':
   with col1:
       mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["陽線"],key="multiselect") #選択項目
   with col2:
-      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA5:傾き正","SMA25 > 75","SMA5:V字に反転"],key="multiselect2")#選択項目 
+      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA25:傾き正","SMA25 > 75","SMA5:V字に反転"],key="multiselect2")#選択項目 
   with col3:
       mul_sel3 = st.multiselect("出来高", (select_option3),default=["出来高前日比プラス"],key="multiselect3")#選択項目
 
@@ -73,7 +73,7 @@ elif default_button =='PerfectOrder_example':
 #   with col1:
 #       mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["陽線"],key="multiselect") #選択項目
 #   with col2:
-#       mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA5:傾き正","SMA25 > 75"],key="multiselect2")#選択項目 
+#       mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA25:傾き正","SMA25 > 75"],key="multiselect2")#選択項目 
 #   with col3:
 #       mul_sel3 = st.multiselect("出来高", (select_option3),default=["出来高前日比プラス"],key="multiselect3")#選択項目
 
