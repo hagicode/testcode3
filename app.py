@@ -1,3 +1,4 @@
+
 import streamlit as st
 import streamlit.components.v1 as stc
 import pandas as pd
@@ -10,57 +11,88 @@ from streamlit_option_menu import option_menu
 def cache_image(img):
     st.image(img)
 
+def clear_multi():
+    st.session_state.multiselect = []
+    st.session_state.multiselect2 = []
+    st.session_state.multiselect3 = []
+    return
 
 #screening_file = 'demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
 
-screening_file = 'DEMO (1).xlsx'
-df = pd.read_excel(screening_file,sheet_name="Sheet1")
+screening_file = '230502_demo.xlsx'
+#screening_file = '/content/drive/MyDrive/ColabNotebooks/kaba_file2/20230506/230502_demo.xlsx'
+df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
 st.set_page_config(layout="wide")
 
 st.subheader('Screening Option') 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">手法選択</p>', unsafe_allow_html=True)
-
-method = option_menu("Method Menu", options=["グランビルNo3", "Granville3", "Granville4", "Perfect Order", "Zenmo", "SMA200"],
+method_menu = ["Granvil", "PerfectOrder", "Zenmo #工事中"]
+method = option_menu("Method Menu", options= method_menu,
     #icons=['house', 'gear', 'gear'],
     menu_icon="cast", default_index=0, orientation="horizontal")
 
 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">プライスアクション・移動平均線</p>', unsafe_allow_html=True)
+default_button = st.radio("設定例",    ('Granvil_example', 'PerfectOrder_example'),horizontal=True)
+
 
 col1,col2,col3,col4 = st.columns([1,1,1,1])
 
 #マルチセレクトで抽出可能なカラムから選択肢を作成
-#multi_selectbox_columns = ["ローソク","髭","寄り天・底","大陽線・陰線"]
 multi_selectbox_columns = df.filter(like="R@",axis=1).columns
-select_option = list(df[multi_selectbox_columns].stack().unique())
+select_option = sorted(list(df[multi_selectbox_columns].stack().unique()))
 
 multi_selectbox_columns2 = df.filter(like="MA@",axis=1).columns
-select_option2 = list(df[multi_selectbox_columns2].stack().unique())
+select_option2 = sorted(list(df[multi_selectbox_columns2].stack().unique()))
 
-with col1:
-    #選択された項目
-    mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option)) 
+multi_selectbox_columns3 = df.filter(like="Vol@",axis=1).columns
+select_option3 = sorted(list(df[multi_selectbox_columns3].stack().unique()))
 
 
-with col2:
-    #選択された項目
-    mul_sel2 = st.multiselect("移動平均線との関係", (select_option2)) 
 
+if default_button =='Granvil_example':
+  with col1:
+      mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["陽線"],key="multiselect") #選択項目
+  with col2:
+      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA5:傾き正","SMA25 > 75","SMA5:V字に反転"],key="multiselect2")#選択項目 
+  with col3:
+      mul_sel3 = st.multiselect("出来高", (select_option3),default=["出来高前日比プラス"],key="multiselect3")#選択項目
+
+elif default_button =='PerfectOrder_example':
+  with col1:
+      mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["強気リバーサル"],key="multiselect") #選択項目
+  with col2:
+      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["PO:SMA20,50,75"],key="multiselect2")#選択項目 
+  with col3:
+      mul_sel3 = st.multiselect("出来高", (select_option3),key="multiselect3")#選択項目
+
+# else:
+#   with col1:
+#       mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["陽線"],key="multiselect") #選択項目
+#   with col2:
+#       mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA5:傾き正","SMA25 > 75"],key="multiselect2")#選択項目 
+#   with col3:
+#       mul_sel3 = st.multiselect("出来高", (select_option3),default=["出来高前日比プラス"],key="multiselect3")#選択項目
+
+
+st.button("Clear selection", on_click=clear_multi)
+st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">設定変更後にdefault条件に戻したい場合はブラウザを再読込みしてください。<br>その場合Storage Listも初期化されます。</p>', unsafe_allow_html=True)
+
+#選択された項目
+mul_sel_all = mul_sel + mul_sel2 + mul_sel3
 
 #選択された項目を含む列
-select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0] + df.columns[df.isin(mul_sel2).sum(axis=0)>0]
+select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0].tolist() + df.columns[df.isin(mul_sel2).sum(axis=0)>0].tolist() + df.columns[df.isin(mul_sel3).sum(axis=0)>0].tolist()
 
 #選択された項目で抽出したデータフレーム
-data = df[df[select_columns].isin(mul_sel).sum(axis=1)==len(select_columns)]
-# selected = [method,"ローソク"]
-# print(selected)
-# data = df[df[method]=="〇"][df["ローソク"]==button1].drop(columns=selected)
+data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
 
 
 st.subheader('Data:' + str(len(data)) + "銘柄") 
-st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。キリバンや出来高偏差のフィルタには表内機能で可能です。<br>ソートも可能ですが、ChartBarの順番には反映されません。</p>', unsafe_allow_html=True)
+
 
 gb = GridOptionsBuilder.from_dataframe(data)
 #gb.configure_grid_options(rowHeight=30)
@@ -69,7 +101,7 @@ gb.configure_side_bar()
 gb.configure_pagination(paginationPageSize=30)
 gb.configure_selection(selection_mode = 'multiple', use_checkbox=True)
 gb.configure_default_column(filterable=True,sortable=True,enablePivot = False, enableValue = False)
-gb.configure_column("コード", headerCheckboxSelection = True, headerCheckboxSelectionFilteredOnly=True)#めちゃ大事
+gb.configure_column("ticker", headerCheckboxSelection = True, headerCheckboxSelectionFilteredOnly=True)#めちゃ大事
 
 gridOptions = gb.build()
 selects =AgGrid(data,theme="streamlit",
@@ -84,7 +116,6 @@ selects =AgGrid(data,theme="streamlit",
 
 num=len(selects)
 
-
 if "storage_list" not in st.session_state:
   st.session_state["storage_list"] = []
 
@@ -93,7 +124,7 @@ with st.sidebar:
     st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">リストの確認とダウンロード</p>', unsafe_allow_html=True)
     if st.button(label="show"):
         storaged_data = [code for code in st.session_state["storage_list"]]
-        storage_df = df.copy().set_index("コード").loc[storaged_data].iloc[:,:1]
+        storage_df = df.copy().set_index("ticker").loc[storaged_data][["name"]]
         st.table(storage_df)
 
         storage_df["Kabutan"]=[f"https://kabutan.jp/stock/chart?code={code_}" for code_ in storage_df.index.tolist()]
@@ -108,29 +139,15 @@ with st.sidebar:
                 )
 
     st.header("Chart Bar")
-    st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">サイドバーのサイズでチャートサイズを変えられます</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">サイドバーのサイズでチャートサイズを変えられます<br>他のMAの組合せや詳細を確認したいときはKabutanURLへ</p>', unsafe_allow_html=True)
     if num > 0 :
         
         for i, selcect in enumerate(selects):
-            code = selects[i]["コード"]
-            stock_name = selects[i]["銘柄"]
+            code = selects[i]["ticker"]
+            stock_name = selects[i]["name"]
             st.write(f"Kabutan URL [{code}  {stock_name} ](https://kabutan.jp/stock/chart?code={code})")
             img=f"https://www.kabudragon.com/chart/s={code}/e=230502.png/"
             cache_image(img) #cache
 
             #html_code =  f'<iframe src="//www.invest-jp.net/blogparts/stocharmini/{code}/d/1/160" width="160" height="300" style="border:none;margin:0;" scrolling="no"></iframe><div style="font-size:7pt;">by <a href="https://www.invest-jp.net/" target="_blank">株価チャート</a>「ストチャ」</div>'
             #stc.html(html_code,height = 500)
-
-            if st.button(label=f"Storage / Remove {code}"):
-                if code not in st.session_state["storage_list"]:
-                    st.session_state["storage_list"].append(code)
-                    storaged_data = [code for code in st.session_state["storage_list"]]
-                    st.write(str(storaged_data))
-                else:
-                    st.session_state["storage_list"].remove(code)
-                    st.write(str(code) + "removed!")
-                    storaged_data = [code for code in st.session_state["storage_list"]]
-                    st.write(str(storaged_data))
-    else:
-        pass
-
