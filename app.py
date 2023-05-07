@@ -28,7 +28,7 @@ st.set_page_config(layout="wide")
 
 st.subheader('Screening Option') 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">手法選択</p>', unsafe_allow_html=True)
-method_menu = ["Granvil", "PerfectOrder", "Zenmo #工事中"]
+method_menu = ["Granvil", "PerfectOrder", "Zenmo #工事中", "All Data"]
 method = option_menu("Method Menu", options= method_menu,
     #icons=['house', 'gear', 'gear'],
     menu_icon="cast", default_index=0, orientation="horizontal")
@@ -36,9 +36,10 @@ method = option_menu("Method Menu", options= method_menu,
 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">プライスアクション・移動平均線</p>', unsafe_allow_html=True)
 default_button = st.radio("設定例",    ('Granvil_example', 'PerfectOrder_example'),horizontal=True)
+st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">デモ用にSMA5,25,75の設定にしています。</p>', unsafe_allow_html=True)
 
 
-col1,col2,col3,col4 = st.columns([1,1,1,1])
+col1,col2,col3 = st.columns([1,2,1])
 
 #マルチセレクトで抽出可能なカラムから選択肢を作成
 multi_selectbox_columns = df.filter(like="R@",axis=1).columns
@@ -62,9 +63,9 @@ if default_button =='Granvil_example':
 
 elif default_button =='PerfectOrder_example':
   with col1:
-      mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["強気リバーサル"],key="multiselect") #選択項目
+      mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["当日下髭"],key="multiselect") #選択項目
   with col2:
-      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["PO:SMA20,50,75"],key="multiselect2")#選択項目 
+      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA5,25,75_PO_start"],key="multiselect2")#選択項目 
   with col3:
       mul_sel3 = st.multiselect("出来高", (select_option3),key="multiselect3")#選択項目
 
@@ -87,7 +88,11 @@ mul_sel_all = mul_sel + mul_sel2 + mul_sel3
 select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0].tolist() + df.columns[df.isin(mul_sel2).sum(axis=0)>0].tolist() + df.columns[df.isin(mul_sel3).sum(axis=0)>0].tolist()
 
 #選択された項目で抽出したデータフレーム
-data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
+if method_menu == method_memu[3] :
+  st.write(method_menu)
+  #data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
+else:
+  data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
 
 
 st.subheader('Data:' + str(len(data)) + "銘柄") 
@@ -151,3 +156,17 @@ with st.sidebar:
 
             #html_code =  f'<iframe src="//www.invest-jp.net/blogparts/stocharmini/{code}/d/1/160" width="160" height="300" style="border:none;margin:0;" scrolling="no"></iframe><div style="font-size:7pt;">by <a href="https://www.invest-jp.net/" target="_blank">株価チャート</a>「ストチャ」</div>'
             #stc.html(html_code,height = 500)
+
+            if st.button(label=f"Storage / Remove {code}"):
+                if code not in st.session_state["storage_list"]:
+                    st.session_state["storage_list"].append(code)
+                    storaged_data = [code for code in st.session_state["storage_list"]]
+                    st.write(str(storaged_data))
+                else:
+                    st.session_state["storage_list"].remove(code)
+                    st.write(str(code) + "removed!")
+                    storaged_data = [code for code in st.session_state["storage_list"]]
+                    st.write(str(storaged_data))
+    else:
+        pass
+
