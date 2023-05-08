@@ -35,7 +35,7 @@ df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
 
 st.subheader('Screening Option') 
-st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">手法選択</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-family:sans-serif; color:green; font-size: 10px;">手法選択</p>', unsafe_allow_html=True)
 method_menu = ["Granvil", "PerfectOrder", "Zenmo #工事中", "All Data"]
 method = option_menu("Method Menu", options= method_menu,
     #icons=['house', 'gear', 'gear'],
