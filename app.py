@@ -19,7 +19,7 @@ def clear_multi():
     st.session_state.multiselect3 = []
     return
 
-l2 = sorted(glob.glob('.files/*.xlsx', recursive=True))
+l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
 st.write(l2[-1])
 
 #screening_file = 'demo.xlsx'
