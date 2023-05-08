@@ -6,6 +6,8 @@ from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid.shared import JsCode
 from streamlit_option_menu import option_menu
+import glob
+import os
 
 @st.cache_data
 def cache_image(img):
@@ -16,6 +18,11 @@ def clear_multi():
     st.session_state.multiselect2 = []
     st.session_state.multiselect3 = []
     return
+
+l = grob.glob("*.xlsx")
+l2 = grob.glob(('**/*.xlsx', recursive=True))
+st.write("l",l)
+st.write("l2",l2)
 
 #screening_file = 'demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
