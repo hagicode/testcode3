@@ -13,3 +13,10 @@ showWarningOnDirectExecution = false
 # Acceptable values: - 'legacy': Serialize DataFrames using Streamlit's custom format. Slow but battle-tested. - 'arrow': Serialize DataFrames using Apache Arrow. Much faster and versatile.
 # Default: "arrow"
 dataFrameSerialization = "arrow"
+
+[theme]
+ primaryColor="#3872fb"
+ backgroundColor="#0e1117"
+ secondaryBackgroundColor="#cece1b"
+ textColor="#fafafa"
+ font="sans serif"
