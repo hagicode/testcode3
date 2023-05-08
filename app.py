@@ -22,12 +22,12 @@ def clear_multi():
 
 l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
 p = pathlib.Path(l2[-1]).resolve()
-st.write(p
+st.write(p)
 
 #screening_file = 'demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
 
-screening_file = l2[-1]
+screening_file = p
 #screening_file = '/content/drive/MyDrive/ColabNotebooks/kaba_file2/20230506/230502_demo.xlsx'
 df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
