@@ -31,7 +31,7 @@ screening_file = '230502_demo.xlsx'
 #screening_file = '/content/drive/MyDrive/ColabNotebooks/kaba_file2/20230506/230502_demo.xlsx'
 df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
-st.set_page_config(layout="wide")
+#st.set_page_config(layout="wide")
 
 st.subheader('Screening Option') 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">手法選択</p>', unsafe_allow_html=True)
