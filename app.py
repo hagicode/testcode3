@@ -20,10 +20,12 @@ def clear_multi():
     st.session_state.multiselect3 = []
     return
 
+st.set_page_config(layout="wide")
+
 l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
 p = pathlib.Path(l2[-1])
 update_date = os.path.split(p)[1].replace("_demo.xlsx","")
-st.write("データ更新日："update_date)
+st.write("データ更新日：" + update_date)
 
 #screening_file = '/content/drive/MyDrive/ColabNotebooks/kaba_file2/20230506/230502_demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
@@ -31,7 +33,6 @@ st.write("データ更新日："update_date)
 screening_file = p
 df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
-#st.set_page_config(layout="wide")
 
 st.subheader('Screening Option') 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">手法選択</p>', unsafe_allow_html=True)
