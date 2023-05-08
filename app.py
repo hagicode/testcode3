@@ -19,15 +19,13 @@ def clear_multi():
     st.session_state.multiselect3 = []
     return
 
-l = glob.glob("*.xlsx")
 l2 = sorted(glob.glob('.files/*.xlsx', recursive=True))
-st.write("l",l)
 st.write("l2",l2)
 
 #screening_file = 'demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
 
-screening_file = '230502_demo.xlsx'
+screening_file = l2[-1]
 #screening_file = '/content/drive/MyDrive/ColabNotebooks/kaba_file2/20230506/230502_demo.xlsx'
 df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
