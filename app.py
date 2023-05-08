@@ -22,7 +22,8 @@ def clear_multi():
 
 l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
 p = pathlib.Path(l2[-1])
-st.write(p)
+update_date = os.path.split(p)
+st.write(update_date)
 
 #screening_file = 'demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
@@ -158,7 +159,7 @@ with st.sidebar:
             code = selects[i]["ticker"]
             stock_name = selects[i]["name"]
             st.write(f"Kabutan URL [{code}  {stock_name} ](https://kabutan.jp/stock/chart?code={code})")
-            img=f"https://www.kabudragon.com/chart/s={code}/e=230502.png/"
+            img=f"https://www.kabudragon.com/chart/s={code}/e={update_date}.png/"
             cache_image(img) #cache
 
             #html_code =  f'<iframe src="//www.invest-jp.net/blogparts/stocharmini/{code}/d/1/160" width="160" height="300" style="border:none;margin:0;" scrolling="no"></iframe><div style="font-size:7pt;">by <a href="https://www.invest-jp.net/" target="_blank">株価チャート</a>「ストチャ」</div>'
