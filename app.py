@@ -7,6 +7,7 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid.shared import JsCode
 from streamlit_option_menu import option_menu
 import glob
+import pathlib
 import os
 
 @st.cache_data
@@ -20,7 +21,8 @@ def clear_multi():
     return
 
 l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
-st.write(l2[-1])
+p = pathlib.Path(l2[-1]).resolve()
+st.write(p
 
 #screening_file = 'demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
