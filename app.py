@@ -22,7 +22,7 @@ def clear_multi():
 
 l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
 p = pathlib.Path(l2[-1])
-update_date = os.path.split(p)[1].replace("_demo.xlsx")
+update_date = os.path.split(p)[1].replace("_demo.xlsx","")
 st.write(update_date)
 
 #screening_file = 'demo.xlsx'
