@@ -20,7 +20,7 @@ def clear_multi():
     return
 
 l2 = sorted(glob.glob('.files/*.xlsx', recursive=True))
-st.write("l2",l2)
+st.write(l2[-1])
 
 #screening_file = 'demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
