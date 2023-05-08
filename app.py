@@ -21,7 +21,7 @@ def clear_multi():
     return
 
 l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
-p = pathlib.Path(l2[-1]).resolve()
+p = pathlib.Path(l2[-1])
 st.write(p)
 
 #screening_file = 'demo.xlsx'
