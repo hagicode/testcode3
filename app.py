@@ -20,7 +20,7 @@ def clear_multi():
     return
 
 l = glob.glob("*.xlsx")
-l2 = glob.glob('**/*.xlsx', recursive=True)
+l2 = glob.glob('.files/*.xlsx', recursive=True)
 st.write("l",l)
 st.write("l2",l2)
 
