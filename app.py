@@ -27,7 +27,7 @@ st.write(p)
 #screening_file = 'demo.xlsx'
 #df = pd.read_excel(screening_file,sheet_name="DEMO")
 
-screening_file = p
+screening_file = '230502_demo.xlsx'
 #screening_file = '/content/drive/MyDrive/ColabNotebooks/kaba_file2/20230506/230502_demo.xlsx'
 df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
