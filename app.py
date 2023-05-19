@@ -102,7 +102,10 @@ elif default_button =='PerfectOrder_example':
 #   with col3:
 #       mul_sel3 = st.multiselect("出来高", (select_option3),default=["出来高前日比プラス"],key="multiselect3")#選択項目
 
-
+with st.expander("show more"):
+    values1 = st.slider('2つの値で範囲を指定します。',  0, 10000, (900, 1050) ,step=50)
+    st.write(values1)
+    
 st.button("Clear selection", on_click=clear_multi)
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">設定変更後にdefault条件に戻したい場合はブラウザを再読込みしてください。<br>その場合Storage Listも初期化されます。</p>', unsafe_allow_html=True)
 
