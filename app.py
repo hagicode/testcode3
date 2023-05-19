@@ -20,21 +20,21 @@ def clear_multi():
     return
 
 #github
-st.set_page_config(layout="wide")
+# st.set_page_config(layout="wide")
 
-l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
-p = pathlib.Path(l2[-1])
-update_date = os.path.split(p)[1].replace("_demo.xlsx","")
-st.write("データ更新日：" + update_date)
-
-screening_file = p
-df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
-
-# #ローカル用
-# screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230518/230518_demo.xlsx'
-# df = pd.read_excel(screening_file,index_col=0 )
-# update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
+# l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
+# p = pathlib.Path(l2[-1])
+# update_date = os.path.split(p)[1].replace("_demo.xlsx","")
 # st.write("データ更新日：" + update_date)
+
+# screening_file = p
+# df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
+
+#ローカル用
+screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230518/230518_demo.xlsx'
+df = pd.read_excel(screening_file,index_col=0 )
+update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
+st.write("データ更新日：" + update_date)
 
 
 st.subheader('Screening Option') 
@@ -79,8 +79,10 @@ select_option3 = sorted(list(df[multi_selectbox_columns3].stack().unique()))
 if default_button =='Granvil_example':
   with col1:
       mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["陽線"],key="multiselect") #選択項目
+
   with col2:
       mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA25:傾き正","SMA25 > 75","SMA5:V字に反転"],key="multiselect2")#選択項目 
+
   with col3:
       mul_sel3 = st.multiselect("出来高", (select_option3),default=["出来高前日比プラス"],key="multiselect3")#選択項目
 
@@ -173,7 +175,16 @@ with st.sidebar:
         for i, selcect in enumerate(selects):
             code = selects[i]["ticker"]
             stock_name = selects[i]["name"]
+            Kessan_schedule = selects[i]["決算発表日"]
             st.write(f"Kabutan URL [{code}  {stock_name} ](https://kabutan.jp/stock/chart?code={code})")
+
+            if Kessan_schedule is not None : 
+                st.write(f"決算発表日(予) {Kessan_schedule}")
+                st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">予定日は掲載後に変更される可能性があります。</p>', unsafe_allow_html=True)
+            else:
+                Kessan_schedule = "未定"
+                st.write(f"決算発表日(予) {Kessan_schedule}")
+
             img=f"https://www.kabudragon.com/chart/s={code}/e={update_date}.png/"
             cache_image(img) #cache
 
