@@ -1,4 +1,3 @@
-
 import streamlit as st
 import streamlit.components.v1 as stc
 import pandas as pd
@@ -20,18 +19,22 @@ def clear_multi():
     st.session_state.multiselect3 = []
     return
 
-st.set_page_config(layout="wide")
+#github
+# st.set_page_config(layout="wide")
 
-l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
-p = pathlib.Path(l2[-1])
-update_date = os.path.split(p)[1].replace("_demo.xlsx","")
+# l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
+# p = pathlib.Path(l2[-1])
+# update_date = os.path.split(p)[1].replace("_demo.xlsx","")
+# st.write("データ更新日：" + update_date)
+
+# screening_file = p
+# df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
+
+#ローカル用
+screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230518/230518_demo.xlsx'
+df = pd.read_excel(screening_file,index_col=0 )
+update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
 st.write("データ更新日：" + update_date)
-
-#screening_file = '/content/drive/MyDrive/ColabNotebooks/kaba_file2/20230506/230502_demo.xlsx'
-#df = pd.read_excel(screening_file,sheet_name="DEMO")
-
-screening_file = p
-df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
 
 st.subheader('Screening Option') 
@@ -54,7 +57,19 @@ multi_selectbox_columns = df.filter(like="R@",axis=1).columns
 select_option = sorted(list(df[multi_selectbox_columns].stack().unique()))
 
 multi_selectbox_columns2 = df.filter(like="MA@",axis=1).columns
-select_option2 = sorted(list(df[multi_selectbox_columns2].stack().unique()))
+SO2 = sorted(list(df[multi_selectbox_columns2].stack().unique()))
+
+so2 = ([s for s in SO2 if '傾き正' in s]
+        +[s for s in SO2 if 'V字に反転' in s]
+        +[s for s in SO2 if '収束' in s]
+        +[s for s in SO2 if '乖離小' in s]
+        +[s for s in SO2 if 'ローソク足内' in s]
+        +[s for s in SO2 if '下髭内' in s]
+        +[s for s in SO2 if '連日推移' in s]
+        +[s for s in SO2 if 'PO' in s]
+        +[s for s in SO2 if '>' in s])
+
+select_option2 = so2 + list(set(SO2) - set(so2))
 
 multi_selectbox_columns3 = df.filter(like="Vol@",axis=1).columns
 select_option3 = sorted(list(df[multi_selectbox_columns3].stack().unique()))
@@ -177,4 +192,3 @@ with st.sidebar:
                     st.write(str(storaged_data))
     else:
         pass
-
