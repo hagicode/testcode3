@@ -146,7 +146,7 @@ else:
 
 
 st.subheader('Data:' + str(len(data)) + "銘柄") 
-st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。キリバンや出来高偏差のフィルタには表内機能で可能です。<br>ソートも可能ですが、ChartBarの順番には反映されません。</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。キリバンや出来高偏差のフィルタには表内機能で可能です。<br>ソートも可能ですが、ChartBarの順番には反映されません。<br>表内のフィルターはチェックボックスを一度外してからお使いください。</p>', unsafe_allow_html=True)
 
 
 gb = GridOptionsBuilder.from_dataframe(data)
