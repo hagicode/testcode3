@@ -19,28 +19,31 @@ def clear_multi():
     st.session_state.multiselect3 = []
     return
 
+def clear_input():
+    st.session_state.input_txt = ""
+    return
 
 #github
-st.set_page_config(layout="wide")
+# st.set_page_config(layout="wide")
 
-l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
-p = pathlib.Path(l2[-1])
-update_date = os.path.split(p)[1].replace("_demo.xlsx","")
-st.write("データ更新日：" + update_date)
+# l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
+# p = pathlib.Path(l2[-1])
+# update_date = os.path.split(p)[1].replace("_demo.xlsx","")
+# st.write("データ更新日：" + update_date)
 
-screening_file = p
-df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
+# screening_file = p
+# df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
 #ローカル用
-# screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230518/230518_demo.xlsx'
-# df = pd.read_excel(screening_file,index_col=0 )
-# update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
-# st.write("データ更新日：" + update_date)
+screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230604/230602_demo.xlsx'
+df = pd.read_excel(screening_file,index_col=0 )
+update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
+st.write("データ更新日：" + update_date)
 
 
 st.subheader('Screening Option') 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">手法選択</p>', unsafe_allow_html=True)
-method_menu = ["Granvil", "PerfectOrder", "Zenmo #工事中", "All Data"]
+method_menu = ["Granvil", "PerfectOrder", "全モ", "All Data"]
 method = option_menu("Method Menu", options= method_menu,
     #icons=['house', 'gear', 'gear'],
     menu_icon="cast", default_index=0, orientation="horizontal")
@@ -114,10 +117,6 @@ mul_sel_all = mul_sel + mul_sel2 + mul_sel3
 #選択された項目を含む列
 select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0].tolist() + df.columns[df.isin(mul_sel2).sum(axis=0)>0].tolist() + df.columns[df.isin(mul_sel3).sum(axis=0)>0].tolist()
 
-def clear_input():
-    st.session_state.input_txt = ""
-    return
-
 with st.expander('条件をtxtファイルに保存・貼付け'):
     if len(mul_sel_all)>0:
         text_contents = str(method) + "/" + str(mul_sel_all)
@@ -140,13 +139,16 @@ with st.expander('条件をtxtファイルに保存・貼付け'):
 #選択された項目で抽出したデータフレーム
 
 if method == "All Data" :
-    data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
+    #data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
+    data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore')
+
 else:
-    data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
+    #data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
+    data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore')
 
 
 st.subheader('Data:' + str(len(data)) + "銘柄") 
-st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。キリバンや出来高偏差のフィルタには表内機能で可能です。<br>ソートも可能ですが、ChartBarの順番には反映されません。<br>表内のフィルターはチェックボックスを一度外してからお使いください。</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。キリバンや出来高偏差のフィルタには表内機能で可能です。<br>ソートも可能ですが、ChartBarの順番には反映されません。</p>', unsafe_allow_html=True)
 
 
 gb = GridOptionsBuilder.from_dataframe(data)
