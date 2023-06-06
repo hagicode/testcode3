@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as stc
 import pandas as pd
+import numpy as np
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid.shared import JsCode
@@ -34,7 +35,7 @@ st.write("データ更新日：" + update_date)
 screening_file = p
 df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
-#ローカル用
+# #ローカル用
 # screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230604/230602_demo.xlsx'
 # df = pd.read_excel(screening_file,index_col=0 )
 # update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
@@ -123,6 +124,21 @@ sort_option = ["ticker","close","volume","vol/sigma"]
 sort1 = st.radio("並替基準", (sort_option),horizontal=True) #先頭がdefault
 sort2 = st.radio("昇順・降順", (["昇順","降順"]),horizontal=True)
 
+#スライダー
+slider_bottun = st.radio("スライダー", (["close","volume","vol/sigma","全モ下落幅%"]),horizontal=True)
+if slider_bottun != "全モ下落幅%":
+    slider_list = [round(df[slider_bottun].quantile(i),1) for i in np.linspace(0,1,21)]
+    slider=st.select_slider("指定範囲/※分位数での5%区切り", options=slider_list,value=(slider_list[0],slider_list[-1]))
+else:
+    slider_list = [round(df[(df["全モ"]==1)][slider_bottun].quantile(i),1) for i in np.linspace(0,1,21)]
+    slider=st.select_slider("指定範囲/※分位数での5%区切り", options=slider_list,value=(slider_list[0],slider_list[-1]))    
+
+#その他
+EPS_growth = st.radio("売上高/EPS成長率(予)(%)", (["全データ","未発表は含まない"]),horizontal=True) 
+if EPS_growth == "未発表は含まない":
+    growth =(df["EPS成長率(予)(%)"] != "未")
+else:
+    growth =(df["EPS成長率(予)(%)"] != "")
 
 with st.expander('条件をtxtファイルに保存・貼付け'):
     if len(mul_sel_all)>0:
@@ -148,15 +164,15 @@ with st.expander('条件をtxtファイルに保存・貼付け'):
 if method == "All Data" :
     if sort2 == "昇順":
         #data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
-        data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1)
+        data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1)
     else:
-        data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
+        data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
 else:
     if sort2 == "昇順":
         #data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
-        data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1)
+        data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1)
     else:
-        data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
+        data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
 
 st.subheader('Data:' + str(len(data)) + "銘柄") 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。キリバンや出来高偏差のフィルタには表内機能で可能です。<br>ソートも可能ですが、ChartBarの順番には反映されません。</p>', unsafe_allow_html=True)
