@@ -35,21 +35,20 @@ st.write("データ更新日：" + update_date)
 screening_file = p
 df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
-# #ローカル用
-# screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230604/230602_demo.xlsx'
+#ローカル用
+# screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230611/230609_demo.xlsx'
 # df = pd.read_excel(screening_file,index_col=0 )
 # update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
 # st.write("データ更新日：" + update_date)
 
 
-st.subheader('Screening Option') 
-st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">手法選択</p>', unsafe_allow_html=True)
 method_menu = ["Granvil", "PerfectOrder", "全モ", "All Data"]
-method = option_menu("Method Menu", options= method_menu,
+method = option_menu("手法選択", options= method_menu,
     #icons=['house', 'gear', 'gear'],
     menu_icon="cast", default_index=0, orientation="horizontal")
 
-
+st.divider() 
+st.markdown('<p style="font-family:sans-serif; color:black; font-size: 20px;">テクニカル</p>', unsafe_allow_html=True)
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">プライスアクション・移動平均線</p>', unsafe_allow_html=True)
 default_button = st.radio("設定例",    ('Granvil_example', 'PerfectOrder_example'),horizontal=True)
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">デモ用にSMA5,25,75の設定にしています。</p>', unsafe_allow_html=True)
@@ -119,26 +118,49 @@ mul_sel_all = mul_sel + mul_sel2 + mul_sel3
 #選択された項目を含む列
 select_columns = df.columns[df.isin(mul_sel).sum(axis=0)>0].tolist() + df.columns[df.isin(mul_sel2).sum(axis=0)>0].tolist() + df.columns[df.isin(mul_sel3).sum(axis=0)>0].tolist()
 
-#ソート
-sort_option = ["ticker","close","volume","vol/sigma"]
-sort1 = st.radio("並替基準", (sort_option),horizontal=True) #先頭がdefault
-sort2 = st.radio("昇順・降順", (["昇順","降順"]),horizontal=True)
+#押しの深さ
+dip_slider_bottun = st.radio("押しの深さ", (["下落幅%(5日間の高値)","下落幅%(25日間の高値)","全モ下落幅%"]),horizontal=True)
+if dip_slider_bottun != "全モ下落幅%":
+    dip_slider_list = [round(df[dip_slider_bottun].quantile(i),1) for i in np.linspace(0,1,21)]
+    dip_slider=st.select_slider("指定範囲/※分位数での5%区切り", options=dip_slider_list,value=(dip_slider_list[0],dip_slider_list[-1]))
+else:
+    dip_slider_list = [round(df[(df["全モ"]==1)][dip_slider_bottun].quantile(i),1) for i in np.linspace(0,1,21)]
+    dip_slider=st.select_slider("指定範囲/※分位数での5%区切り", options=dip_slider_list,value=(dip_slider_list[0],dip_slider_list[-1]))
 
-#スライダー
-slider_bottun = st.radio("スライダー", (["close","volume","vol/sigma","全モ下落幅%"]),horizontal=True)
-if slider_bottun != "全モ下落幅%":
+
+#ソート
+st.divider() 
+st.markdown('<p style="font-family:sans-serif; color:black; font-size: 20px;">その他項目</p>', unsafe_allow_html=True)
+col4,col5,col6 = st.columns([2,3,2])
+
+with col4:
+    sort_option = ["ticker","close","volume","vol/sigma"]
+    sort1 = st.radio("並替基準", (sort_option),horizontal=True) #先頭がdefault
+    sort2 = st.radio("昇順・降順", (["昇順","降順"]),horizontal=True)
+
+with col5:
+    #スライダー
+    slider_bottun = st.radio("数値項目", (["close","volume","vol/sigma"]),horizontal=True)
     slider_list = [round(df[slider_bottun].quantile(i),1) for i in np.linspace(0,1,21)]
     slider=st.select_slider("指定範囲/※分位数での5%区切り", options=slider_list,value=(slider_list[0],slider_list[-1]))
-else:
-    slider_list = [round(df[(df["全モ"]==1)][slider_bottun].quantile(i),1) for i in np.linspace(0,1,21)]
-    slider=st.select_slider("指定範囲/※分位数での5%区切り", options=slider_list,value=(slider_list[0],slider_list[-1]))    
 
-#その他
-EPS_growth = st.radio("売上高/EPS成長率(予)(%)", (["全データ","未発表は含まない"]),horizontal=True) 
-if EPS_growth == "未発表は含まない":
-    growth =(df["EPS成長率(予)(%)"] != "未")
-else:
-    growth =(df["EPS成長率(予)(%)"] != "")
+with col6:
+    #その他
+    EPS_growth = st.radio("売上高/EPS成長率(予)(%)", (["全データ","未発表は含まない"]),horizontal=True) 
+    if EPS_growth == "未発表は含まない":
+        growth =(df["EPS成長率(予)(%)"] != "未")
+    else:
+        growth =(df["EPS成長率(予)(%)"] != "") #ダミー
+
+    #値上がり率ランキング
+    rank =st.radio("値上り/値下り率ランキング", (["全データ","上位(10日以内)","上位(25日以内)"]),horizontal=True) 
+    if rank != "全データ":
+        rank_tag = (df["値上り/値下り率" + rank] == 1)
+    else:
+        rank_tag = (df["値上り/値下り率上位(10日以内)"] != "") #ダミー
+
+st.markdown("---")
+
 
 with st.expander('条件をtxtファイルに保存・貼付け'):
     if len(mul_sel_all)>0:
@@ -164,17 +186,17 @@ with st.expander('条件をtxtファイルに保存・貼付け'):
 if method == "All Data" :
     if sort2 == "昇順":
         #data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
-        data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1)
+        data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][rank_tag][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])][(dip_slider[0] < df[dip_slider_bottun])&(df[dip_slider_bottun]< dip_slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","下落幅%(5日間の高値)","下落幅%(25日間の高値)","全モ下落幅%","値上り/値下り率上位(10日以内)","値上り/値下り率上位(25日以内)"], axis=1, errors='ignore').sort_values(sort1)
     else:
-        data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
+        data = df[(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][rank_tag][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])][(dip_slider[0] < df[dip_slider_bottun])&(df[dip_slider_bottun]< dip_slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","下落幅%(5日間の高値)","下落幅%(25日間の高値)","全モ下落幅%","値上り/値下り率上位(10日以内)","値上り/値下り率上位(25日以内)"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
 else:
     if sort2 == "昇順":
         #data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore')
-        data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1)
+        data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][rank_tag][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])][(dip_slider[0] < df[dip_slider_bottun])&(df[dip_slider_bottun]< dip_slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","下落幅%(5日間の高値)","下落幅%(25日間の高値)","全モ下落幅%","値上り/値下り率上位(10日以内)","値上り/値下り率上位(25日以内)"], axis=1, errors='ignore').sort_values(sort1)
     else:
-        data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","全モ下落幅%"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
+        data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][rank_tag][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])][(dip_slider[0] < df[dip_slider_bottun])&(df[dip_slider_bottun]< dip_slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","下落幅%(5日間の高値)","下落幅%(25日間の高値)","全モ下落幅%","値上り/値下り率上位(10日以内)","値上り/値下り率上位(25日以内)"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
 
-st.subheader('Data:' + str(len(data)) + "銘柄") 
+st.subheader('データリスト:' + str(len(data)) + "銘柄") 
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。キリバンや出来高偏差のフィルタには表内機能で可能です。<br>ソートも可能ですが、ChartBarの順番には反映されません。</p>', unsafe_allow_html=True)
 
 
