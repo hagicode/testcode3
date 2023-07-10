@@ -25,21 +25,21 @@ def clear_input():
     return
 
 #github
-st.set_page_config(layout="wide")
+#st.set_page_config(layout="wide")
 
-l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
-p = pathlib.Path(l2[-1])
-update_date = os.path.split(p)[1].replace("_demo.xlsx","")
-st.write("データ更新日：" + update_date)
+#l2 = sorted(glob.glob('files/*.xlsx', recursive=True))
+#p = pathlib.Path(l2[-1])
+#update_date = os.path.split(p)[1].replace("_demo.xlsx","")
+#st.write("データ更新日：" + update_date)
 
-screening_file = p
-df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
+#screening_file = p
+#df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
 #ローカル用
-# screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230611/230609_demo.xlsx'
-# df = pd.read_excel(screening_file,index_col=0 )
-# update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
-# st.write("データ更新日：" + update_date)
+screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230710/230710_demo.xlsx'
+df = pd.read_excel(screening_file,index_col=0 )
+update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
+st.write("データ更新日：" + update_date)
 
 
 method_menu = ["Granvil", "PerfectOrder", "全モ", "All Data"]
@@ -252,7 +252,8 @@ with st.sidebar:
             code = selects[i]["ticker"]
             stock_name = selects[i]["name"]
             Kessan_schedule = selects[i]["決算発表日"]
-            st.write(f"Kabutan URL [{code}  {stock_name} ](https://kabutan.jp/stock/chart?code={code})")
+
+            st.write(f"{code} {stock_name}",f"([株探](https://kabutan.jp/stock/chart?code={code})/[TradingView](https://jp.tradingview.com/chart/?symbol=TSE%3A{code}))")
 
             if Kessan_schedule is not None : 
                 st.write(f"決算発表日(予) {Kessan_schedule}")
