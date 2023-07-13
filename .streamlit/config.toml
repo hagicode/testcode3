@@ -14,9 +14,6 @@ showWarningOnDirectExecution = false
 # Default: "arrow"
 dataFrameSerialization = "arrow"
 
-[theme]
- primaryColor="#3872fb"
- backgroundColor="#0e1117"
- secondaryBackgroundColor="#cece1b"
- textColor="#fafafa"
- font="sans serif"
+ [theme]
+base="light"
+
