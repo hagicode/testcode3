@@ -24,6 +24,14 @@ def clear_input():
     st.session_state.input_txt = ""
     return
 
+def is_int(s):
+    try:
+        int(s)
+    except ValueError:
+        return False
+    else:
+        return True
+
 #github
 st.set_page_config(layout="wide")
 
@@ -35,11 +43,12 @@ st.write("データ更新日：" + update_date)
 screening_file = p
 df = pd.read_excel(screening_file,sheet_name="Sheet1",index_col=0 )
 
-# #ローカル用
+#ローカル用
 # screening_file = '/content/drive/MyDrive/master_ColabNotebooks/kabu_files/multi_account_files/20230710/230710_demo.xlsx'
 # df = pd.read_excel(screening_file,index_col=0 )
 # update_date = os.path.basename(screening_file).replace("_demo.xlsx","")
 # st.write("データ更新日：" + update_date)
+
 
 
 method_menu = ["Granvil", "PerfectOrder", "全モ", "All Data"]
@@ -47,7 +56,21 @@ method = option_menu("手法選択", options= method_menu,
     #icons=['house', 'gear', 'gear'],
     menu_icon="cast", default_index=0, orientation="horizontal")
 
-st.divider() 
+#アップロードリスト
+with st.expander("じぶんの銘柄リストから絞込む"):
+    st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">1列目に銘柄コードが来るように記載ください。文字列は無視されます。</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">活用例：四季報・株探などファンダで絞込んだリスト／自分の取引銘柄など</p>', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("マイリストアップロード", type='csv') 
+    if uploaded_file is not None:
+        upload_df = pd.read_csv(uploaded_file)
+        mycode_lists_org = upload_df.iloc[:,0]
+        mycode_lists = [int(s) for s in mycode_lists_org if is_int(s)]
+        mylist_button = st.radio("マイリストでの絞込み",    ('無', '有'), horizontal=True)
+        
+        if mylist_button =='有':
+            df = df[df['ticker'].isin(mycode_lists)]
+
+st.divider()
 st.markdown('<p style="font-family:sans-serif; color:black; font-size: 20px;">テクニカル</p>', unsafe_allow_html=True)
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">プライスアクション・移動平均線</p>', unsafe_allow_html=True)
 default_button = st.radio("設定例",    ('Granvil_example', 'PerfectOrder_example'),horizontal=True)
@@ -85,7 +108,7 @@ if default_button =='Granvil_example':
       mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["陽線"],key="multiselect") #選択項目
 
   with col2:
-      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA25:傾き正","SMA25 > 75","SMA5:V字に反転"],key="multiselect2")#選択項目 
+      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA25:傾き正","SMA25 > 75","SMA5:V字に反転"],key="multiselect2")#選択項目
 
   with col3:
       mul_sel3 = st.multiselect("出来高", (select_option3),default=["出来高前日比プラス"],key="multiselect3")#選択項目
@@ -94,7 +117,7 @@ elif default_button =='PerfectOrder_example':
   with col1:
       mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["当日下髭"],key="multiselect") #選択項目
   with col2:
-      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA5,25,75_PO_start"],key="multiselect2")#選択項目 
+      mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA5,25,75_PO_start"],key="multiselect2")#選択項目
   with col3:
       mul_sel3 = st.multiselect("出来高", (select_option3),key="multiselect3")#選択項目
 
@@ -102,7 +125,7 @@ elif default_button =='PerfectOrder_example':
 #   with col1:
 #       mul_sel = st.multiselect("ローソク足・プライスアクション", (select_option),default=["陽線"],key="multiselect") #選択項目
 #   with col2:
-#       mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA25:傾き正","SMA25 > 75"],key="multiselect2")#選択項目 
+#       mul_sel2 = st.multiselect("移動平均線との関係", (select_option2),default=["SMA25:傾き正","SMA25 > 75"],key="multiselect2")#選択項目
 #   with col3:
 #       mul_sel3 = st.multiselect("出来高", (select_option3),default=["出来高前日比プラス"],key="multiselect3")#選択項目
 
@@ -129,7 +152,7 @@ else:
 
 
 #ソート
-st.divider() 
+st.divider()
 st.markdown('<p style="font-family:sans-serif; color:black; font-size: 20px;">その他項目</p>', unsafe_allow_html=True)
 col4,col5,col6 = st.columns([2,3,2])
 
@@ -146,14 +169,14 @@ with col5:
 
 with col6:
     #その他
-    EPS_growth = st.radio("売上高/EPS成長率(予)(%)", (["全データ","未発表は含まない"]),horizontal=True) 
+    EPS_growth = st.radio("売上高/EPS成長率(予)(%)", (["全データ","未発表は含まない"]),horizontal=True)
     if EPS_growth == "未発表は含まない":
         growth =(df["EPS成長率(予)(%)"] != "未")
     else:
         growth =(df["EPS成長率(予)(%)"] != "") #ダミー
 
     #値上がり率ランキング
-    rank =st.radio("値上り/値下り率ランキング", (["全データ","上位(10日以内)","上位(25日以内)"]),horizontal=True) 
+    rank =st.radio("値上り/値下り率ランキング", (["全データ","上位(10日以内)","上位(25日以内)"]),horizontal=True)
     if rank != "全データ":
         rank_tag = (df["値上り/値下り率" + rank] == 1)
     else:
@@ -196,7 +219,7 @@ else:
     else:
         data = df[(df[method]>0)&(df[select_columns].isin(mul_sel_all).sum(axis=1)==len(select_columns))][growth][rank_tag][(slider[0] < df[slider_bottun])&(df[slider_bottun]< slider[1])][(dip_slider[0] < df[dip_slider_bottun])&(df[dip_slider_bottun]< dip_slider[1])].drop(multi_selectbox_columns, axis=1).drop(multi_selectbox_columns2, axis=1).drop(multi_selectbox_columns3, axis=1).drop(method_menu, axis=1, errors='ignore').drop(["全モ日数","下落幅%(5日間の高値)","下落幅%(25日間の高値)","全モ下落幅%","値上り/値下り率上位(10日以内)","値上り/値下り率上位(25日以内)"], axis=1, errors='ignore').sort_values(sort1, ascending=False)
 
-st.subheader('データリスト:' + str(len(data)) + "銘柄") 
+st.subheader('データリスト:' + str(len(data)) + "銘柄")
 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">20個程度まで絞ってください。キリバンや出来高偏差のフィルタには表内機能で可能です。<br>ソートも可能ですが、ChartBarの順番には反映されません。</p>', unsafe_allow_html=True)
 
 
@@ -234,7 +257,7 @@ with st.sidebar:
         st.table(storage_df)
 
         storage_df["Kabutan"]=[f"https://kabutan.jp/stock/chart?code={code_}" for code_ in storage_df.index.tolist()]
-        
+
 
         if len(storage_df)>0:
             st.download_button(
@@ -247,7 +270,7 @@ with st.sidebar:
     st.header("Chart Bar")
     st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">サイドバーのサイズでチャートサイズを変えられます<br>他のMAの組合せや詳細を確認したいときはKabutanURLへ</p>', unsafe_allow_html=True)
     if num > 0 :
-        
+
         for i, selcect in enumerate(selects):
             code = selects[i]["ticker"]
             stock_name = selects[i]["name"]
@@ -255,7 +278,7 @@ with st.sidebar:
 
             st.write(f"{code} {stock_name}",f"([株探](https://kabutan.jp/stock/chart?code={code})/[TradingView](https://jp.tradingview.com/chart/?symbol=TSE%3A{code}))")
 
-            if Kessan_schedule is not None : 
+            if Kessan_schedule is not None :
                 st.write(f"決算発表日(予) {Kessan_schedule}")
                 st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">予定日は掲載後に変更される可能性があります。</p>', unsafe_allow_html=True)
             else:
