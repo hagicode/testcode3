@@ -249,7 +249,8 @@ if "storage_list" not in st.session_state:
   st.session_state["storage_list"] = []
 
 with st.sidebar:
-    st.header("キャッシュのクリア：夜7時以降も前日のチャートの場合、キャッシュが残ってる可能性があるため、ボタンを押してください。")
+    st.header("キャッシュのクリア")
+    st.markdown('<p style="font-family:sans-serif; color:blue; font-size: 10px;">夜7時以降も前日のチャートの場合、キャッシュを消すことで直る場合があります。</p>', unsafe_allow_html=True)
     if st.button("Cache Clear"):
     # Clear values from *all* all in-memory and on-disk data caches:
     # i.e. clear values from both square and cube
