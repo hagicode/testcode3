@@ -1,3 +1,4 @@
+pip==24.0
 click==8.0.4
 streamlit==1.22.0
 streamlit-aggrid==0.3.4.post3
