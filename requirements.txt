@@ -3,4 +3,5 @@ streamlit==1.22.0
 streamlit-aggrid==0.3.4.post3
 streamlit-option-menu==0.3.2
 openpyxl==3.0.1
-numpy==1.22.2
+numpy
+pandas
